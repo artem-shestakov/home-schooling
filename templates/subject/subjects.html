@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<ol>
+    {% for subject in subjects %}
+    <li><a href="{% url 'subject' subject.id %}">{{subject.title}}</a></li>
+    {% endfor %}
+</ol>
+
+{% if request.user.is_superuser %}
+<form action="{% url 'create_subject' %}" method="get">
+    <button type="submit">Добавить</button>
+ </form>
+{% endif %}
+{% endblock %}

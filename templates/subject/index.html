@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load extra_tag %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    {% if request.user|has_group:"teachers" %}
+    <form action="{% url 'subjects' %}" method="get">
+      <button type="submit">Добавить урок</button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="row">
+    {% for day in days %}
+    <div class="col-3">
+      <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title">{{day.date}}</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <a href="{% url 'day' year=day.date.year month=day.date.month day=day.date.day%}" class="btn btn-primary">Детали</a>
+        </div>
+      </div>
+    </div>
+    
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endblock %}

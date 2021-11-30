@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Предмет</th>
+            <th scope="col">Домашннее задание</th>
+            <th scope="col">Оценка</th>
+            <th scope="col">Дествия</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for lesson in lessons %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{lesson.subject}}</td>
+            <td>{{lesson.home_work}}</td>
+            <td>{{lesson.grade}}</td>
+            {% if user.is_authenticated %}
+            <td>
+                <button type="button" class="btn btn-success"><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+            </td>
+            {% else %}
+            <td>
+                <button type="button" class="btn btn-success" disabled><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
+            </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+</div>
+{% endblock %}
