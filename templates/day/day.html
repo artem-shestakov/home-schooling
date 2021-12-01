@@ -38,9 +38,9 @@
           </select>
         </div>
         {% if user.is_authenticated %}
-        <button type="submit" class="btn btn-primary form-control">Добавить</button>
+        <button type="submit" class="btn btn-success form-control">Добавить</button>
         {% else %}
-        <button type="submit" class="btn btn-primary form-control" disabled>Добавить</button>
+        <button type="submit" class="btn btn-success form-control" disabled>Добавить</button>
         {% endif %}
       </form>
     </div>
@@ -65,12 +65,12 @@
             <td>{{lesson.grade}}</td>
             {% if user.is_authenticated %}
             <td>
-                <button type="button" class="btn btn-success"><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
                 <button id="delLesson" lesson="{{lesson.id}}" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
             </td>
             {% else %}
             <td>
-                <button type="button" class="btn btn-success"  disabled><i class="fas fa-edit"></i></button>
+                <button type="button" class="btn btn-warning"  disabled><i class="fas fa-edit"></i></button>
                 <button id="delLesson" lesson="{{lesson.id}}" type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
             </td>
             {% endif %}
@@ -129,12 +129,12 @@ function appendToLessonTable(lesson) {
   <td>${lesson.grade}</td>
   {% if user.is_authenticated %}
   <td>
-      <button type="button" class="btn btn-success"><i class="fas fa-edit"></i></button>
+      <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
       <button id="delLesson" lesson="${lesson.id}" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
   </td>
   {% else %}
   <td>
-      <button type="button" class="btn btn-success" disabled><i class="fas fa-edit"></i></button>
+      <button type="button" class="btn btn-warning" disabled><i class="fas fa-edit"></i></button>
       <button id="delLesson" lesson="${lesson.id}" type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
   </td>
   {% endif %}`
