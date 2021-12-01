@@ -7,7 +7,7 @@
 <div class="container">
   <div class="row">
     {% if request.user|has_group:"teachers" %}
-    <form action="{% url 'subjects' %}" method="get">
+    <form action="{% url 'create_day' %}" method="get">
       <button type="submit">Добавить урок</button>
     </form>
     {% endif %}

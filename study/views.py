@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from django import template
 from django.contrib.auth.models import User
@@ -6,10 +7,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models.base import Model
 from django.shortcuts import render, redirect
 from django.template import loader
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
-from .models import Day, Subject
-from .forms import CreateSubject, LoginForm
+from .models import Day, Subject, Lesson
+from .forms import CreateDay, CreateSubject, LoginForm
+from django.views.decorators.csrf import csrf_protect
 
 register = template.Library()
 
@@ -80,8 +82,57 @@ def get_day(request, year, month, day):
     date = datetime(year, month, day)
     study_day = Day.objects.get(date=date)
     lessons = study_day.lesson_set.all()
+    subjects = Subject.objects.all()
     return render(request, 'day/day.html', 
         {
             "day": study_day,
-            "lessons": lessons
+            "lessons": lessons,
+            "subjects": subjects
         })
+
+def create_day(request):
+    if request.method =="POST":
+        form = CreateDay(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect("/")
+    else:
+        form = CreateDay()
+    return render(request, "day/create.html", {"form": form})
+
+def add_lesson(request, day_id):
+    subject = request.POST.get("subject")
+    description = request.POST.get("description")
+    homework = request.POST.get("homework")
+    grade = request.POST.get("grade")
+    print(grade)
+    if grade == "":
+        grade = None
+    
+    day = Day.objects.get(id=day_id)
+    subject = Subject.objects.get(title=subject)
+    if day.lesson_set.filter(subject=subject.id).exists():
+        return HttpResponseBadRequest("Object already exists")
+    new_lesson = Lesson.objects.create(
+        subject=subject,
+        description=description,
+        home_work=homework,
+        grade=grade,
+        day_id=day_id
+    )
+
+    lesson = {
+        "id": new_lesson.id,
+        "subject": new_lesson.subject.title,
+        "description": new_lesson.description,
+        "home_work": new_lesson.home_work,
+        "grade": new_lesson.grade
+    }
+
+    return JsonResponse({"lesson": lesson})
+
+def delete_lesson(request):
+    lesson_id = request.POST.get("lesson_id")
+    Lesson.objects.get(pk=lesson_id).delete()
+
+    return JsonResponse({"deleted": True})

@@ -1,6 +1,7 @@
 from django import forms
+from django.contrib.auth import models
 from django.forms import ModelForm, Textarea
-from .models import Subject
+from .models import Day, Subject
 from django.contrib.auth.models import User
 
 class LoginForm(forms.Form):
@@ -17,5 +18,15 @@ class CreateSubject(ModelForm):
         fields = ["title", "teacher"]
         labels = {
             'title': 'Название предмета',
+        }
+
+class CreateDay(ModelForm):
+    lesson = forms.ModelChoiceField(Subject.objects.all())
+    
+    class Meta:
+        model = Day
+        fields = ["date", "lesson"]
+        labels = {
+            "date": "Дата",
         }
         

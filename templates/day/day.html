@@ -2,7 +2,51 @@
 
 {% block content %}
 <div class="container">
-    <table class="table table-hover">
+  <div class="row">
+    <div class="col-4">
+      <form id="addLesson" action="">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="subjectInput">Предмет</label>
+          <select id="subjectInput" class="form-control" name="subject">
+            {% for subject in subjects %}
+            {% if forloop.counter == 1 %}
+            <option selected>{{ subject.title }}</option>
+            {% else %}
+            <option>{{ subject.title }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="descriptionInput">Описание</label>
+          <textarea class="form-control" id="descriptionInput" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="homeWorkInput">Домашнее задание</label>
+          <textarea class="form-control" id="homeWorkInput" name="homework" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="gradeInput">Оценка</label>
+          <select id="gradeInput" class="form-control" name="grade">
+            <option selected></option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+        </div>
+        {% if user.is_authenticated %}
+        <button type="submit" class="btn btn-primary form-control">Добавить</button>
+        {% else %}
+        <button type="submit" class="btn btn-primary form-control" disabled>Добавить</button>
+        {% endif %}
+      </form>
+    </div>
+
+    <div class="col-8">
+      <table class="table table-hover" id="lessonsTable">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -22,17 +66,103 @@
             {% if user.is_authenticated %}
             <td>
                 <button type="button" class="btn btn-success"><i class="fas fa-edit"></i></button>
-                <button type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+                <button id="delLesson" lesson="{{lesson.id}}" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
             </td>
             {% else %}
             <td>
-                <button type="button" class="btn btn-success" disabled><i class="fas fa-edit"></i></button>
-                <button type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-success"  disabled><i class="fas fa-edit"></i></button>
+                <button id="delLesson" lesson="{{lesson.id}}" type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
             </td>
             {% endif %}
           </tr>
         {% endfor %}
         </tbody>
       </table>
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+$("form#addLesson").submit(function() {
+  var subjectInput = $('select[name="subject"]').val().trim();
+  var descriptionInput = $('textarea[name="description"]').val().trim();
+  var homeworkInput = $('textarea[name="homework"]').val().trim();
+  var gradeInput = $('select[name="grade"]').val().trim();
+  const csrftoken = getCookie('csrftoken');
+  
+  if (subjectInput && descriptionInput) {
+      // Create Ajax Call
+      $.ajax({
+          url: "{% url 'add_lesson' day_id=day.id %}",
+          method: "POST",
+          headers: { 
+            'X-CSRFToken': csrftoken
+          },
+          data: {
+              'subject': subjectInput,
+              'description': descriptionInput,
+              'homework': homeworkInput,
+              'grade': gradeInput
+          },
+          dataType: 'json',
+          success: function (data) {
+              if (data.lesson) {
+                appendToLessonTable(data.lesson);
+              }
+          }
+      });
+    } else {
+      alert("All fields must have a valid value.");
+  }
+  $('form#addLesson').trigger("reset");
+  return false;
+});
+
+function appendToLessonTable(lesson) {
+  var tableRef = document.getElementById('lessonsTable').getElementsByTagName('tbody')[0];
+  var rowData = `<th scope="row">${tableRef.rows.length+1}</th>
+  <td>${lesson.subject}</td>
+  <td>${lesson.home_work}</td>
+  <td>${lesson.grade}</td>
+  {% if user.is_authenticated %}
+  <td>
+      <button type="button" class="btn btn-success"><i class="fas fa-edit"></i></button>
+      <button id="delLesson" lesson="${lesson.id}" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+  </td>
+  {% else %}
+  <td>
+      <button type="button" class="btn btn-success" disabled><i class="fas fa-edit"></i></button>
+      <button id="delLesson" lesson="${lesson.id}" type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
+  </td>
+  {% endif %}`
+  var newRow = tableRef.insertRow(tableRef.rows.length);
+  newRow.innerHTML = rowData;
+}
+
+$('tbody').on('click', '#delLesson', function() {
+  let id = $(this).attr('lesson');
+  const csrftoken = getCookie('csrftoken');
+  data = {
+    "lesson_id": id
+  };
+  mythis = this;
+  $.ajax({
+    url: "{% url 'delete_lesson' %}",
+    method: "POST",
+    headers: { 
+      'X-CSRFToken': csrftoken
+    },
+    data: data,
+    success: function(data){
+      if (data.deleted) {
+        $(mythis).closest('tr').fadeOut();
+      }
+    }
+  })
+});
+
+</script>
 {% endblock %}
