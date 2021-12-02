@@ -77,11 +77,11 @@
         </thead>
         <tbody>
         {% for lesson in lessons %}
-          <tr>
-            <th scope="row">{{ forloop.counter }}</th>
-            <td>{{lesson.subject}}</td>
-            <td>{{lesson.home_work}}</td>
-            <td>{% if lesson.grade %}{{lesson.grade}}{% else %}{% endif %}</td>
+          <tr id="{{lesson.id}}">
+            <th scope="row" name="index">{{ forloop.counter }}</th>
+            <td name="subject">{{lesson.subject}}</td>
+            <td name="homework">{{lesson.home_work}}</td>
+            <td name="grade">{% if lesson.grade %}{{lesson.grade}}{% else %}{% endif %}</td>
             {% if user.is_authenticated %}
             <td>
                 <button type="button" id="editBtn" lesson="{{lesson.id}}" class="btn btn-warning"><i class="fas fa-edit"></i></button>
@@ -252,7 +252,6 @@ $('tbody').on('click', '#editBtn', function() {
     data: {"lesson_id": id},
     success: function(data) {
       if (data) {
-        console.log(data)
         $('#subjectInputModal').val(data.subject)
         $('#descriptionInputModal').val(data.description)
         $('#homeWorkInputModal').val(data.homework)
@@ -268,30 +267,44 @@ $('tbody').on('click', '#editBtn', function() {
 // Update lesson
 $('#updateLessonModal').click(function() {
   const csrftoken = getCookie('csrftoken');
-  let data = JSON.stringify({
+  let lesson_data = {
     "lesson_id": $('#updateLessonModal').attr('lesson'),
     "subject": $('#subjectInputModal').val().trim(),
     "description": $('#descriptionInputModal').val().trim(),
     "home_work": $('#homeWorkInputModal').val().trim(),
     "grade": $('#gradeInputModal').val().trim(),
     "day_id": $('#updateLessonModal').attr('day')
-  })
+  }
   $.ajax({
     url: "{% url 'update_lesson' %}",
     method: "POST",
     dataType: 'json',
-    data: data,
+    data: JSON.stringify(lesson_data),
     headers: {
       'X-CSRFToken': csrftoken,
       'Content-Type': 'application/json'
     },
     contentType: 'application/json',
     success: function(data) {
-      console.log(data)
+      if (!data.error) {
+        $(`table#lessonsTable #${data.lesson}`).children().each(function() {
+          attr = $(this).attr('name')
+          if (attr === 'subject') {
+            $(this).text(lesson_data.subject)
+          }
+          if (attr === 'homework') {
+            $(this).text(lesson_data.home_work)
+          }
+          if (attr === 'grade') {
+            $(this).text(lesson_data.grade)
+          }
+        })
+      }
     }
   })
   $('form#edirLessonModal').trigger("reset");
   $('#editLesson').modal('hide');
+
   return false;
 })
 

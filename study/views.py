@@ -172,10 +172,14 @@ def update_lesson(request):
     lesson.subject = subject
     lesson.description = body["description"]
     lesson.home_work = body["home_work"]
-    lesson.grade = int(body["grade"])
+    if body["grade"]:
+        lesson.grade = int(body["grade"])
+    else:
+        lesson.grade = None
     lesson.save()
     return JsonResponse({
         "error": False,
+        "lesson": lesson.id
     })
 
 def delete_lesson(request):

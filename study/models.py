@@ -20,7 +20,10 @@ class Subject(models.Model):
         return self.title
 
 class Lesson(models.Model):
-    subject = models.ForeignKey(Subject, on_delete=models.PROTECT)
+    subject = models.ForeignKey(
+        Subject, 
+        on_delete=models.PROTECT,
+        unique=True)
     description = models.TextField('Lesson description')
     home_work = models.TextField('Home work')
     grade = models.IntegerField('Studen\'s grade for lesson',
