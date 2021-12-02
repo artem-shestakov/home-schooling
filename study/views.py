@@ -139,7 +139,7 @@ def add_lesson(request, day_id):
         grade=grade,
         day_id=day_id
     )
-
+    
     lesson = {
         "id": new_lesson.id,
         "subject": new_lesson.subject.title,

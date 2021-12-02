@@ -62,7 +62,7 @@
             <th scope="row">{{ forloop.counter }}</th>
             <td>{{lesson.subject}}</td>
             <td>{{lesson.home_work}}</td>
-            <td>{{lesson.grade}}</td>
+            <td>{% if lesson.grade %}{{lesson.grade}}{% else %}{% endif %}</td>
             {% if user.is_authenticated %}
             <td>
                 <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
@@ -111,6 +111,9 @@ $("form#addLesson").submit(function() {
           success: function (data) {
               if (data.lesson) {
                 appendToLessonTable(data.lesson);
+                $('tbody > tr').each(function(index, tr) { 
+                  tr.cells[0].innerHTML = index + 1;
+                });
               }
           }
       });
@@ -123,6 +126,9 @@ $("form#addLesson").submit(function() {
 
 function appendToLessonTable(lesson) {
   var tableRef = document.getElementById('lessonsTable').getElementsByTagName('tbody')[0];
+  if (!lesson.grade) {
+    lesson.grade = ""
+  };
   var rowData = `<th scope="row">${tableRef.rows.length+1}</th>
   <td>${lesson.subject}</td>
   <td>${lesson.home_work}</td>
@@ -142,6 +148,7 @@ function appendToLessonTable(lesson) {
   newRow.innerHTML = rowData;
 }
 
+// Delete lesson
 $('tbody').on('click', '#delLesson', function() {
   let id = $(this).attr('lesson');
   const csrftoken = getCookie('csrftoken');
@@ -149,20 +156,27 @@ $('tbody').on('click', '#delLesson', function() {
     "lesson_id": id
   };
   mythis = this;
-  $.ajax({
-    url: "{% url 'delete_lesson' %}",
-    method: "POST",
-    headers: { 
-      'X-CSRFToken': csrftoken
-    },
-    data: data,
-    success: function(data){
-      if (data.deleted) {
-        $(mythis).closest('tr').fadeOut();
+  var action = confirm("Вы уверены, что хотите удалить урок?");
+  if (action) {
+    $.ajax({
+      url: "{% url 'delete_lesson' %}",
+      method: "POST",
+      headers: { 
+        'X-CSRFToken': csrftoken
+      },
+      data: data,
+      success: function(data){
+        if (data.deleted) {
+          $(mythis).closest('tr').remove();
+          $('tbody > tr').each(function(index, tr) { 
+            tr.cells[0].innerHTML = index + 1;
+          }); 
+        }
       }
-    }
+    })
+  };
   })
-});
+  
 
 </script>
 {% endblock %}
