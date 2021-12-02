@@ -5,6 +5,7 @@ from django import template
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
 from django.core.exceptions import ValidationError
 from django.db.models.base import Model
 from django.db.utils import IntegrityError
@@ -139,7 +140,7 @@ def add_lesson(request, day_id):
         grade=grade,
         day_id=day_id
     )
-    
+
     lesson = {
         "id": new_lesson.id,
         "subject": new_lesson.subject.title,
@@ -149,6 +150,33 @@ def add_lesson(request, day_id):
     }
 
     return JsonResponse({"lesson": lesson})
+
+def get_lesson(request):
+    lesson_id = request.GET.get("lesson_id")
+    lesson = get_object_or_404(Lesson, pk=lesson_id)
+    data = {
+        "lesson_id": lesson.id,
+        "subject": lesson.subject.title,
+        "description": lesson.description,
+        "homework": lesson.home_work,
+        "grade": lesson.grade,
+        "day": lesson.day.id
+    }
+    return JsonResponse(data)
+
+def update_lesson(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    lesson = get_object_or_404(Lesson, pk=int(body["lesson_id"]))
+    subject = Subject.objects.get(title=body["subject"])
+    lesson.subject = subject
+    lesson.description = body["description"]
+    lesson.home_work = body["home_work"]
+    lesson.grade = int(body["grade"])
+    lesson.save()
+    return JsonResponse({
+        "error": False,
+    })
 
 def delete_lesson(request):
     lesson_id = request.POST.get("lesson_id")

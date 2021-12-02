@@ -4,48 +4,67 @@
 <div class="container">
   <div class="row">
     <div class="col-4">
-      <form id="addLesson" action="">
-        {% csrf_token %}
-        <div class="form-group">
-          <label for="subjectInput">Предмет</label>
-          <select id="subjectInput" class="form-control" name="subject">
-            {% for subject in subjects %}
-            {% if forloop.counter == 1 %}
-            <option selected>{{ subject.title }}</option>
+
+      <div class="d-flex flex-column">
+        <div class="d-flex flex-column border rounded mb-2 p-2">
+          <div>
+            <p class="text-center fw-bold">Изменить</p>
+          </div>
+          <div class="d-flex justify-content-around">
+            <input type="date" name="date" id="date">
+            <button class="btn btn-warning">Изменить</button>
+            <button class="btn btn-danger">Удалить</button>
+          </div>
+        </div>
+
+        <div class="col border rounded p-2">
+          <p class="text-center fw-bold">Добавить занятие</p>
+          <form id="addLesson" action="">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="subjectInput">Предмет</label>
+              <select id="subjectInput" class="form-control" name="subject">
+                {% for subject in subjects %}
+                {% if forloop.counter == 1 %}
+                <option selected>{{ subject.title }}</option>
+                {% else %}
+                <option>{{ subject.title }}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="descriptionInput">Описание</label>
+              <textarea class="form-control" id="descriptionInput" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="homeWorkInput">Домашнее задание</label>
+              <textarea class="form-control" id="homeWorkInput" name="homework" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="gradeInput">Оценка</label>
+              <select id="gradeInput" class="form-control" name="grade">
+                <option selected></option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+            {% if user.is_authenticated %}
+            <button type="submit" class="btn btn-success form-control">Добавить</button>
             {% else %}
-            <option>{{ subject.title }}</option>
+            <button type="submit" class="btn btn-success form-control" disabled>Добавить</button>
             {% endif %}
-            {% endfor %}
-          </select>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="descriptionInput">Описание</label>
-          <textarea class="form-control" id="descriptionInput" name="description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="homeWorkInput">Домашнее задание</label>
-          <textarea class="form-control" id="homeWorkInput" name="homework" rows="2"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="gradeInput">Оценка</label>
-          <select id="gradeInput" class="form-control" name="grade">
-            <option selected></option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-          </select>
-        </div>
-        {% if user.is_authenticated %}
-        <button type="submit" class="btn btn-success form-control">Добавить</button>
-        {% else %}
-        <button type="submit" class="btn btn-success form-control" disabled>Добавить</button>
-        {% endif %}
-      </form>
+      </div>
+      
     </div>
 
-    <div class="col-8">
+    <div class="col-7 border rounded p-2">
+      <p class="text-center fw-bold">Занятия</p>
       <table class="table table-hover" id="lessonsTable">
         <thead>
           <tr>
@@ -65,12 +84,12 @@
             <td>{% if lesson.grade %}{{lesson.grade}}{% else %}{% endif %}</td>
             {% if user.is_authenticated %}
             <td>
-                <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
+                <button type="button" id="editBtn" lesson="{{lesson.id}}" class="btn btn-warning"><i class="fas fa-edit"></i></button>
                 <button id="delLesson" lesson="{{lesson.id}}" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
             </td>
             {% else %}
             <td>
-                <button type="button" class="btn btn-warning"  disabled><i class="fas fa-edit"></i></button>
+                <button type="button" id="editBtn" lesson="{{lesson.id}}" class="btn btn-warning"  disabled><i class="fas fa-edit"></i></button>
                 <button id="delLesson" lesson="{{lesson.id}}" type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
             </td>
             {% endif %}
@@ -78,6 +97,53 @@
         {% endfor %}
         </tbody>
       </table>
+      <!-- Modal -->
+      <div class="modal fade" id="editLesson" tabindex="-1" aria-labelledby="editLessonLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="edirLessonModal" action="">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="subjectInputModal">Предмет</label>
+                  <select id="subjectInputModal" class="form-control" name="subjectInputModal">
+                    {% for subject in subjects %}
+                    <option>{{ subject.title }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="descriptionInputModal">Описание</label>
+                  <textarea class="form-control" id="descriptionInputModal" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="homeWorkInputModal">Домашнее задание</label>
+                  <textarea class="form-control" id="homeWorkInputModal" name="homework" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="gradeInputModal">Оценка</label>
+                  <select id="gradeInputModal" class="form-control" name="gradeInputModal">
+                    <option selected></option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+              <button type="button" id="updateLessonModal" class="btn btn-warning">Обновить</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -135,12 +201,12 @@ function appendToLessonTable(lesson) {
   <td>${lesson.grade}</td>
   {% if user.is_authenticated %}
   <td>
-      <button type="button" class="btn btn-warning"><i class="fas fa-edit"></i></button>
+      <button id="editBtn" type="button" lesson="${lesson.id}" class="btn btn-warning"><i class="fas fa-edit"></i></button>
       <button id="delLesson" lesson="${lesson.id}" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
   </td>
   {% else %}
   <td>
-      <button type="button" class="btn btn-warning" disabled><i class="fas fa-edit"></i></button>
+      <button id="editBtn" lesson="${lesson.id}" type="button" class="btn btn-warning" disabled><i class="fas fa-edit"></i></button>
       <button id="delLesson" lesson="${lesson.id}" type="button" class="btn btn-danger" disabled><i class="fas fa-trash-alt"></i></button>
   </td>
   {% endif %}`
@@ -175,8 +241,60 @@ $('tbody').on('click', '#delLesson', function() {
       }
     })
   };
+})
+
+// Get lesson for update
+$('tbody').on('click', '#editBtn', function() {
+  let id = $(this).attr('lesson');
+  $.ajax({
+    url: "{% url 'get_lesson' %}",
+    method: "GET",
+    data: {"lesson_id": id},
+    success: function(data) {
+      if (data) {
+        console.log(data)
+        $('#subjectInputModal').val(data.subject)
+        $('#descriptionInputModal').val(data.description)
+        $('#homeWorkInputModal').val(data.homework)
+        $('#gradeInputModal').val(data.grade)
+        $('#updateLessonModal').attr('lesson', data.lesson_id)
+        $('#updateLessonModal').attr('day', data.day)
+        $('#editLesson').modal('show');
+      }
+    }
   })
-  
+})
+
+// Update lesson
+$('#updateLessonModal').click(function() {
+  const csrftoken = getCookie('csrftoken');
+  let data = JSON.stringify({
+    "lesson_id": $('#updateLessonModal').attr('lesson'),
+    "subject": $('#subjectInputModal').val().trim(),
+    "description": $('#descriptionInputModal').val().trim(),
+    "home_work": $('#homeWorkInputModal').val().trim(),
+    "grade": $('#gradeInputModal').val().trim(),
+    "day_id": $('#updateLessonModal').attr('day')
+  })
+  $.ajax({
+    url: "{% url 'update_lesson' %}",
+    method: "POST",
+    dataType: 'json',
+    data: data,
+    headers: {
+      'X-CSRFToken': csrftoken,
+      'Content-Type': 'application/json'
+    },
+    contentType: 'application/json',
+    success: function(data) {
+      console.log(data)
+    }
+  })
+  $('form#edirLessonModal').trigger("reset");
+  $('#editLesson').modal('hide');
+  return false;
+})
+
 
 </script>
 {% endblock %}
