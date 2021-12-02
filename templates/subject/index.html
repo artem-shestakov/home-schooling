@@ -6,37 +6,35 @@
 {% block content %}
 <div class="container">
   <div class="row">
-    {% if request.user|has_group:"teachers" %}
     <div class="d-grid gap-2 col-2 mx-auto">
+      {% if request.user|has_group:"teachers" %}
       <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Добавить урок</button>
-
+      {% else %}
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" disabled>Добавить урок</button>
+      {% endif %}
       <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Добавить день занятий</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col">
-            <input id="date" type="date">
-          </div>
-          <div class="col">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-          <button type="button" class="btn btn-success">Добавить</button>
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Добавить день занятий</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col">
+                  <input id="date" type="date" name="date">
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button id="createDay" type="button" class="btn btn-success">Добавить</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-    </div>
-    <form action="{% url 'create_day' %}" method="get">
-      <button class="btn btn-success" type="submit">#Добавить урок</button>
-    </form>
-    {% endif %}
   </div>
   <div class="row">
     {% for day in days %}
@@ -45,7 +43,7 @@
         <div class="card-body">
           <h5 class="card-title">{{day.date}}</h5>
           <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          <a href="{% url 'day' year=day.date.year month=day.date.month day=day.date.day%}" class="btn btn-primary">Детали</a>
+          <a href="{% url 'day' id=day.id%}" class="btn btn-primary">Детали</a>
         </div>
       </div>
     </div>
@@ -54,5 +52,34 @@
 
   </div>
 </div>
-
+{% endblock %}
+{% block script %}
+<script>
+  $("#createDay").click(function(){
+    const csrftoken = getCookie('csrftoken');
+    let date = $('input[name=date]').val()
+    if (date === "") {
+      alert("Укажите дату")
+      return
+    }
+    $.ajax({
+      url: "{% url 'create_day' %}",
+      method: "POST",
+      headers: { 
+        'X-CSRFToken': csrftoken
+      },
+      data: {
+        "date": Date.parse(date) / 1000
+      },
+      success: function (resp) {
+        if (!(resp.error)) {
+          console.log(resp)
+          window.location.replace(`day/${resp.day_id}`);
+        } else {
+          console.log(resp.message)
+        }
+      }
+    })
+  })
+</script>
 {% endblock %}

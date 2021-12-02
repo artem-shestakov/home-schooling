@@ -1,10 +1,13 @@
+from functools import cache
 import json
 from datetime import datetime
 from django import template
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db.models.base import Model
+from django.db.utils import IntegrityError
 from django.shortcuts import render, redirect
 from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
@@ -47,7 +50,7 @@ def user_logout(request):
     return redirect("/")
 
 def index(request):
-    days = Day.objects.all()
+    days = Day.objects.all().order_by('-date')
     return render(request, "subject/index.html", {"days": days})
 
 def all_subjects(request):
@@ -71,16 +74,15 @@ def create_subject(request):
             form = CreateSubject(request.POST)
             if form.is_valid():
                 form.save()
-                return HttpResponseRedirect("/subjects")
+                return HttpResponseRedirect("/subject")
         else:
             form = CreateSubject()
         return render(request, "subject/create.html", {'form': form})
     else:
         return HttpResponse("Access forbidden")
 
-def get_day(request, year, month, day):
-    date = datetime(year, month, day)
-    study_day = Day.objects.get(date=date)
+def get_day(request, id):
+    study_day = Day.objects.get(pk=id)
     lessons = study_day.lesson_set.all()
     subjects = Subject.objects.all()
     return render(request, 'day/day.html', 
@@ -91,14 +93,31 @@ def get_day(request, year, month, day):
         })
 
 def create_day(request):
-    if request.method =="POST":
-        form = CreateDay(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect("/")
-    else:
-        form = CreateDay()
-    return render(request, "day/create.html", {"form": form})
+    date = request.POST.get("date")
+    try:
+        date = datetime.utcfromtimestamp(int(date)).strftime("%Y-%m-%d")
+    except ValueError:
+        return JsonResponse({
+            "error": True,
+            "message": "Ошибка в предоставленной дате"
+        }, status=400)
+    day = Day(date=date)
+    try:
+        day.save()
+    except ValidationError:
+        return JsonResponse({
+            "created": False,
+            "message": "Ошибка в предоставленной дате"
+        }, status=400)
+    except IntegrityError:
+        return JsonResponse({
+            "created": False,
+            "message": "Невозможно создать объект"
+        }, status=500)
+    return JsonResponse({
+        "error": False,
+        "day_id": day.id
+        })
 
 def add_lesson(request, day_id):
     subject = request.POST.get("subject")

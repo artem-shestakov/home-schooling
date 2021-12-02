@@ -4,7 +4,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 
 class Day(models.Model):
-    date = models.DateField('Study day', default=datetime.date.today)
+    date = models.DateField(
+        'Study day',
+        default=datetime.date.today,
+        unique=True
+        )
 
     def __str__(self) -> str:
         return str(self.date)
