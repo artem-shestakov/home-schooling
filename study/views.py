@@ -14,7 +14,7 @@ from django.template import loader
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from .models import Day, Subject, Lesson
-from .forms import CreateDay, CreateSubject, LoginForm
+from .forms import ChangeDay, CreateSubject, LoginForm
 from django.views.decorators.csrf import csrf_protect
 
 register = template.Library()
@@ -118,6 +118,17 @@ def create_day(request):
     return JsonResponse({
         "error": False,
         "day_id": day.id
+        })
+
+def change_day(request, day_id):
+    if request.method == "POST":
+        pass
+    else:
+        form = ChangeDay()
+    return render(
+        request, "day/change.html", {
+        "form": form,
+        "day_id": day_id
         })
 
 def add_lesson(request, day_id):

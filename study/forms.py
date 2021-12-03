@@ -20,12 +20,11 @@ class CreateSubject(ModelForm):
             'title': 'Название предмета',
         }
 
-class CreateDay(ModelForm):
-    lesson = forms.ModelChoiceField(Subject.objects.all())
+class ChangeDay(ModelForm):
     
     class Meta:
         model = Day
-        fields = ["date", "lesson"]
+        fields = ["date"]
         labels = {
             "date": "Дата",
         }

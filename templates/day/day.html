@@ -11,9 +11,28 @@
             <p class="text-center fw-bold">Изменить</p>
           </div>
           <div class="d-flex justify-content-around">
-            <input type="date" name="date" id="date">
-            <button class="btn btn-warning">Изменить</button>
+            <button id="changeDayBtn" class="btn btn-warning" date="{{day.date|date:'Y-m-d'}}">Изменить</button>
             <button class="btn btn-danger">Удалить</button>
+
+            <!-- Modal Update date of day -->
+            <div id="updateDayModal" class="modal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Изменение даты</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <input id="dayDateModal" type="date" name="dayDateModal">
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" day={{day.id}}>Обновить</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
           </div>
         </div>
 
@@ -97,12 +116,13 @@
         {% endfor %}
         </tbody>
       </table>
+      
       <!-- Modal -->
       <div class="modal fade" id="editLesson" tabindex="-1" aria-labelledby="editLessonLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <h5 class="modal-title" id="exampleModalLabel">Изменение урока</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -152,6 +172,15 @@
 {% block script %}
 <script>
 
+//Update day
+$('#changeDayBtn').click(function(){
+  let date = $(this).attr('date');
+  console.log(date)
+  document.getElementById("dayDateModal").valueAsDate = new Date(date)
+  $('#updateDayModal').modal('show');
+})
+
+// Add lesson
 $("form#addLesson").submit(function() {
   var subjectInput = $('select[name="subject"]').val().trim();
   var descriptionInput = $('textarea[name="description"]').val().trim();

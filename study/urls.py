@@ -8,6 +8,7 @@ urlpatterns = [
     path("day/<int:id>", views.get_day, name="day"),
     path("day/<int:day_id>/lesson/add", views.add_lesson, name="add_lesson"),
     path("day/create", views.create_day, name="create_day"),
+    path("day/<int:day_id>/change", views.change_day, name="change_day"),
     path("lesson/get", views.get_lesson, name="get_lesson"),
     path("lesson/update", views.update_lesson, name="update_lesson"),
     path("lesson/delete", views.delete_lesson, name="delete_lesson"),
