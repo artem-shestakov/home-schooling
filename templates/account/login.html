@@ -1,14 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- <div class="container"> -->
-    <!-- <div class="row justify-content-center p-3 h-100"> -->
-        <div class="d-flex col-4 justify-content-center border rounded-3 p-3 shadow position-absolute top-50 start-50 translate-middle" style="width: 360px;">
-            <!-- <form action="{% url 'login' %}" method="post">
-                {% csrf_token %}
-                {{ form }}
-                <input type="submit" value="Войти">
-            </form> -->
+<div class="container">
+    <div class="row justify-content-center mt-5 p-3 h-100">
+        <div class="d-flex col-4 justify-content-center border rounded-3 p-3 shadow" style="width: 360px;">
             <form class="w-100" action="{% url 'login' %}" method="post">
                 {% csrf_token %}
                 <div class="mb-3 col-auto">
@@ -24,8 +19,6 @@
                 </div>
               </form>
         </div>
-        
-    <!-- </div> -->
-    
-<!-- </div> -->
+    </div>
+</div>
 {% endblock %}

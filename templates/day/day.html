@@ -6,13 +6,18 @@
     <div class="col-4">
 
       <div class="d-flex flex-column">
-        <div class="d-flex flex-column border rounded mb-2 p-2">
+        <div class="d-flex flex-column border rounded mb-2 p-2 shadow-sm">
           <div>
             <p class="text-center fw-bold">Изменить</p>
           </div>
-          <div class="d-flex justify-content-around">
-            <button id="changeDayBtn" class="btn btn-warning" date="{{day.date|date:'Y-m-d'}}">Изменить</button>
-            <button id="deleteDayBtn" class="btn btn-danger" day="{{ day.id }}">Удалить</button>
+          <div class="d-flex ustify-content-center">
+            {% if user.is_authenticated %}
+            <button id="changeDayBtn" class="btn btn-warning mx-2" date="{{day.date|date:'Y-m-d'}}">Изменить</button>
+            <button id="deleteDayBtn" class="btn btn-danger mx-2" day="{{ day.id }}">Удалить</button>
+            {% else %}
+            <button id="changeDayBtn" class="btn btn-warning mx-2" date="{{day.date|date:'Y-m-d'}}" disabled>Изменить</button>
+            <button id="deleteDayBtn" class="btn btn-danger mx-2" day="{{ day.id }}" disabled>Удалить</button>
+            {% endif %}
 
             <!-- Modal Update date of day -->
             <div id="updateDayModal" class="modal fade" tabindex="-1">
@@ -36,7 +41,7 @@
           </div>
         </div>
 
-        <div class="col border rounded p-2">
+        <div class="col border rounded p-2 shadow-sm">
           <p class="text-center fw-bold">Добавить занятие</p>
           <form id="addLesson" action="">
             {% csrf_token %}
@@ -82,7 +87,7 @@
       
     </div>
 
-    <div class="col-7 border rounded p-2">
+    <div class="col-7 border rounded p-2 shadow-sm">
       <p class="text-center fw-bold">Занятия</p>
       <table class="table table-hover" id="lessonsTable">
         <thead>

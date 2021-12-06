@@ -12,6 +12,7 @@
       {% else %}
       <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createDayModal" disabled>Добавить урок</button>
       {% endif %}
+
       <!-- Modal -->
       <div class="modal fade" id="createDayModal" tabindex="-1" aria-labelledby="createDayModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -39,7 +40,7 @@
   <div class="row">
     {% for day in days %}
     <div class="col-3">
-      <div class="card" style="width: 18rem;">
+      <div class="card shadow" style="width: 18rem;">
         <div class="card-body">
           <h5 class="card-title">{{day.date}}</h5>
           <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
