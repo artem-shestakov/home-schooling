@@ -22,8 +22,7 @@ class Subject(models.Model):
 class Lesson(models.Model):
     subject = models.ForeignKey(
         Subject, 
-        on_delete=models.PROTECT,
-        unique=True)
+        on_delete=models.PROTECT)
     description = models.TextField('Lesson description')
     home_work = models.TextField('Home work')
     grade = models.IntegerField('Studen\'s grade for lesson',

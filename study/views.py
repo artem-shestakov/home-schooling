@@ -11,7 +11,7 @@ from django.db.models.base import Model
 from django.db.utils import IntegrityError
 from django.shortcuts import render, redirect
 from django.template import loader
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest, QueryDict, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
 from .models import Day, Subject, Lesson
 from .forms import ChangeDay, CreateSubject, LoginForm
@@ -120,16 +120,23 @@ def create_day(request):
         "day_id": day.id
         })
 
-def change_day(request, day_id):
-    if request.method == "POST":
-        pass
+def update_day(request, day_id):
+    if request.method == "PUT":
+        date = QueryDict(request.body).get("date")
+        day = get_object_or_404(Day, pk=day_id)
+        day.date = datetime.strptime(date, "%Y-%m-%d")
+        day.save()
+        return JsonResponse({"error": False})
+    else: 
+        return HttpResponseNotAllowed(["PUT"])
+
+def delete_day(request, day_id):
+    if request.method == "DELETE":
+        day = get_object_or_404(Day, pk=day_id)
+        day.delete()
+        return JsonResponse({"error": False})
     else:
-        form = ChangeDay()
-    return render(
-        request, "day/change.html", {
-        "form": form,
-        "day_id": day_id
-        })
+        return HttpResponseNotAllowed(["DELETE"])
 
 def add_lesson(request, day_id):
     subject = request.POST.get("subject")

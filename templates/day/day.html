@@ -12,10 +12,10 @@
           </div>
           <div class="d-flex justify-content-around">
             <button id="changeDayBtn" class="btn btn-warning" date="{{day.date|date:'Y-m-d'}}">Изменить</button>
-            <button class="btn btn-danger">Удалить</button>
+            <button id="deleteDayBtn" class="btn btn-danger" day="{{ day.id }}">Удалить</button>
 
             <!-- Modal Update date of day -->
-            <div id="updateDayModal" class="modal" tabindex="-1">
+            <div id="updateDayModal" class="modal fade" tabindex="-1">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -27,7 +27,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" day={{day.id}}>Обновить</button>
+                    <button type="button" class="btn btn-primary" id="dayUpdateBtn" day={{day.id}}>Обновить</button>
                   </div>
                 </div>
               </div>
@@ -172,12 +172,55 @@
 {% block script %}
 <script>
 
-//Update day
+//Open modal Update day
 $('#changeDayBtn').click(function(){
   let date = $(this).attr('date');
-  console.log(date)
   document.getElementById("dayDateModal").valueAsDate = new Date(date)
   $('#updateDayModal').modal('show');
+})
+
+// Update day
+$('#dayUpdateBtn').click(function() {
+  let date = $('#dayDateModal').val().trim();
+  const csrftoken = getCookie('csrftoken');
+  
+  $.ajax({
+    url: "{% url 'update_day' day_id=day.id %}",
+    method: "PUT",
+    headers: { 
+      'X-CSRFToken': csrftoken
+    },
+    data: {
+      "date": date
+    },
+    success: function(data) {
+      if (!data.error)
+      $('#updateDayModal').modal('hide');
+      $('#changeDayBtn').attr('date', date);
+    }
+  });
+  return false;
+})
+
+// Delete day
+$('#deleteDayBtn').click(function(){
+  const csrftoken = getCookie('csrftoken');
+  let action = confirm("Вы уверены, что хотите удалить день?");
+  if (action) {
+    $.ajax({
+      url: "{% url 'delete_day' day_id=day.id %}",
+      method: "DELETE",
+      headers: { 
+        'X-CSRFToken': csrftoken
+      },
+      success: function(data) {
+        if (!data.error) {
+          window.location.replace('/');
+        }
+      }
+    });
+    return false;
+  }
 })
 
 // Add lesson
