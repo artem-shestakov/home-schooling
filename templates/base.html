@@ -12,7 +12,7 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-    <div class=".container-fluid bg-light">
+    <div class=".container-fluid bg-light mb-2">
       <div class="container">
       <div class="row">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -26,25 +26,26 @@
                   <a class="nav-link" href="{% url 'subjects' %}">Предметы</a>
                 </li>                
               </ul>
-              {% if user.is_authenticated %}
-                <div class="d-flex position-absolute end-0">
-                  <p>{{ user.username }}</p>
-                  <a href="{% url 'logout' %}">
-                    <input class="btn btn-outline-success ml-auto" type="button" value="Выход" />
-                  </a>
-                </div>
-              {% else %}
-                <div class="d-flex position-absolute end-0">
-                  <a href="{% url 'login' %}">
-                    <input class="btn btn-outline-danger ml-auto" type="button" value="Вход" />
-                  </a>
-                </div>
-              {% endif %}
+              <div class="d-flex position-absolute end-0 align-items-center">
+                {% if user.is_authenticated %}
+                <p class="mx-2 my-auto">{{ user.username }}</p>
+                <a class="mx-2" href="{% url 'logout' %}">
+                  <input class="btn btn-outline-success ml-auto" type="button" value="Выход" />
+                </a>
+                {% else %}
+                <a class="mx-2" href="{% url 'login' %}">
+                  <input class="btn btn-outline-danger ml-auto" type="button" value="Вход" />
+                </a>
+                {% endif %}
+              </div>
             </div>
           </div>
         </nav>
       </div>
     </div>
+    </div>
+    <div class="flash-msg" id="flash-msg">
+
     </div>
     
     {% block content %}{% endblock %}

@@ -107,16 +107,13 @@ def create_day(request):
         day.save()
     except ValidationError:
         return JsonResponse({
-            "created": False,
             "message": "Ошибка в предоставленной дате"
         }, status=400)
-    except IntegrityError:
+    except IntegrityError as exc:
         return JsonResponse({
-            "created": False,
             "message": "Невозможно создать объект"
         }, status=500)
     return JsonResponse({
-        "error": False,
         "day_id": day.id
         })
 

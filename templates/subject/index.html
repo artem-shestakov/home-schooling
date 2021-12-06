@@ -5,19 +5,19 @@
 
 {% block content %}
 <div class="container">
-  <div class="row">
+  <div class="row my-2">
     <div class="d-grid gap-2 col-2 mx-auto">
       {% if request.user|has_group:"teachers" %}
-      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Добавить урок</button>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createDayModal">Добавить урок</button>
       {% else %}
-      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" disabled>Добавить урок</button>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createDayModal" disabled>Добавить урок</button>
       {% endif %}
       <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="createDayModal" tabindex="-1" aria-labelledby="createDayModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Добавить день занятий</h5>
+              <h5 class="modal-title" id="createDayModalLabel">Добавить день занятий</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -71,15 +71,27 @@
       data: {
         "date": Date.parse(date) / 1000
       },
-      success: function (resp) {
-        if (!(resp.error)) {
-          console.log(resp)
-          window.location.replace(`day/${resp.day_id}`);
+      error: function(date) {
+        console.log(date.responseJSON.message)
+        let type = 'danger';
+        var alertPlaceholder = document.getElementById('flash-msg')
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = '<div class="alert alert-danger alert-dismissible" id="dangerFlash" role="alert">' + date.responseJSON.message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+        alertPlaceholder.append(wrapper);
+        setTimeout(function() {
+          $('#dangerFlash').fadeOut();
+        }, 5000);
+        $('#createDayModal').modal('hide');
+      },
+      success: function (data) {
+        if (data) {
+          window.location.replace(`day/${data.day_id}`);
         } else {
-          console.log(resp.message)
+          window.location.replace('/');
         }
       }
-    })
+    });
+    return false;
   })
 </script>
 {% endblock %}
