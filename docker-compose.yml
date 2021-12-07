@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  web:
+    image: nginx
+    ports:
+      - '80:80'
+    volumes:
+      - './www/static:/var/www/static'
+      - './web.conf:/etc/nginx/conf.d/default.conf'
+  app:
+    image: artemshestakov/home-study:0.1.0
+    environment:
+      SECRET_KEY: 'django-insecure-lq!!p4ry5y3n-rc2enbdni*irz^*h9(+x5im5467u4n!#^(h=s'
+    command:
+      - 'gunicorn' 
+      - '-c'
+      - 'prod.py'
+    volumes:
+      - './db:/app/db'
