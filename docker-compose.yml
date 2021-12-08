@@ -3,10 +3,10 @@ services:
   web:
     image: nginx
     ports:
-      - '80:80'
+      - '9080:80'
     volumes:
-      - './www/static:/var/www/static'
-      - './web.conf:/etc/nginx/conf.d/default.conf'
+      - '/srv/dev-disk-by-id-md-name-Storage-firstRAID1/Configs/home-scooling/static:/var/www/static'
+      - '/srv/dev-disk-by-id-md-name-Storage-firstRAID1/Configs/home-scooling/web.conf:/etc/nginx/conf.d/default.conf'
   app:
     image: artemshestakov/home-study:0.1.0
     environment:
@@ -16,4 +16,4 @@ services:
       - '-c'
       - 'prod.py'
     volumes:
-      - './db:/app/db'
+      - '/srv/dev-disk-by-id-md-name-Storage-firstRAID1/Configs/home-scooling/db:/app/db'
