@@ -140,7 +140,6 @@ def add_lesson(request, day_id):
     description = request.POST.get("description")
     homework = request.POST.get("homework")
     grade = request.POST.get("grade")
-    print(grade)
     if grade == "":
         grade = None
     

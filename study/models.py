@@ -14,7 +14,11 @@ class Day(models.Model):
         return str(self.date)
 
 class Subject(models.Model):
-    title = models.CharField('Subject title', max_length=200)
+    title = models.CharField(
+        'Subject title',
+        max_length=200,
+        unique=True
+    )
     teacher = models.ForeignKey(User, on_delete=models.PROTECT)
     def __str__(self) -> str:
         return self.title
