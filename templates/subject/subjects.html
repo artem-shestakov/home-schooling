@@ -1,14 +1,48 @@
 {% extends "base.html" %}
-{% block content %}
-<ol>
-    {% for subject in subjects %}
-    <li><a href="{% url 'subject' subject.id %}">{{subject.title}}</a></li>
-    {% endfor %}
-</ol>
 
-{% if request.user.is_superuser %}
-<form action="{% url 'create_subject' %}" method="get">
-    <button type="submit">Добавить</button>
- </form>
-{% endif %}
+{% block title %}
+Предметы
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="d-flex col-3 flex-column">
+            <div class="d-flex border rounded mb-2 p-2 shadow-sm flex-column">
+                <div class="">
+                    <p class="p-1 bg-light text-dark text-center">Добавление предмета</p>
+                </div>
+                <div class="d-flex justify-content-center mb-2">
+                    <button type="button" class="btn btn-success" {% if not request.user.is_superuser %} disabled {% endif %}>Добавить</button>
+                </div>
+            </div>
+            
+            
+        </div>
+        <div class="col rounded mb-2 p-2 shadow">
+            <div class="d-flex">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Название</th>
+                          <th scope="col">Учитель</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for subject in subjects %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ subject.title }}</td>
+                            <td>{{ subject.teacher.last_name }} {{ subject.teacher.first_name }}</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                </table>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
 {% endblock %}
