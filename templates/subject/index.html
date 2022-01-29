@@ -38,19 +38,27 @@
     </div>
   </div>
   <div class="row">
-    {% for day in days %}
-    <div class="col-3">
-      <div class="card shadow" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">{{day.date}}</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          <a href="{% url 'day' id=day.id%}" class="btn btn-primary">Детали</a>
+    {% for date, day in days.items %}
+    <div class="col-3 mb-3">
+      <div class="card shadow h-100" style="width: 18rem">
+        <div class="d-flex justify-content-center mt-2">
+          <h5 class="card-title">{{day.day.date}}</h5>
+        </div>
+        <div class="card-body overflow-auto" style="height: 150px;">
+          <ol>
+            {% for lesson in day.lessons%}
+            <li>
+              <p>{{lesson.subject}}</p>
+            </li>
+            {% endfor %}
+          </ol>
+        </div>
+        <div class="d-flex justify-content-center mb-1">
+          <a href="{% url 'day' id=day.day.id%}" class="btn btn-primary col-6">Детали</a>
         </div>
       </div>
     </div>
-    
     {% endfor %}
-
   </div>
 </div>
 {% endblock %}

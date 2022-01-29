@@ -51,7 +51,13 @@ def user_logout(request):
     return redirect("/")
 
 def index(request):
-    days = Day.objects.all().order_by('-date')
+    days = {}
+    all_days = Day.objects.all().order_by('-date')
+    for day in all_days:
+        days[day.date.strftime('%Y-%m-%d')] = {
+            "day": day,
+            "lessons": day.lesson_set.all()
+        }
     return render(request, "subject/index.html", {"days": days})
 
 def all_subjects(request):
